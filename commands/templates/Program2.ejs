@@ -1,0 +1,37 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using LeagueSharp;
+using LeagueSharp.Common;
+using System.IO;
+using SharpDX;
+
+namespace <%=title%>
+{
+    class Program
+    {
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        public static Menu <%=title%>;
+
+        static void Main(string[] args)
+        {
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
+        }
+
+        private static void Game_OnGameLoad(EventArgs args)
+        {
+            #region menu
+            <%=title%>.AddSubMenu(new Menu("Features", "Features"));
+            <%=title%>.AddToMainMenu();
+            #endregion
+
+            Game.OnUpdate += Game_OnGameUpdate;
+        }
+
+        private static void Game_OnGameUpdate(EventArgs args)
+        {
+            //hey
+        }
+    }
+}

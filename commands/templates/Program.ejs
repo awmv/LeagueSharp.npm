@@ -1,0 +1,103 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using LeagueSharp;
+using LeagueSharp.Common;
+using System.IO;
+using SharpDX;
+
+namespace <%=champion%>
+{
+    class Program
+    {
+        public const string ChampionName = "<%=champion%>";
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        public static Menu <%=champion%>;
+        public static Orbwalking.Orbwalker Orbwalker;
+        <%=spells%>
+        public static List<Spell> SpellList = new List<Spell>();
+        public static float QMana, EMana, WMana, RMana;
+        public static bool Combo, LaneClear, LastHit, Mixed, None;
+
+        static void Main(string[] args)
+        {
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
+        }
+
+        private static void Game_OnGameLoad(EventArgs args)
+        {
+            if (Player.ChampionName != ChampionName) return;
+
+            #region menu
+            <%=champion%> = new Menu(ChampionName, ChampionName, true);
+            var targetselector = new Menu("Target Selector", "Target Selector");
+            TargetSelector.AddToMenu(targetselector);
+            <%=champion%>.AddSubMenu(targetselector);
+
+            <%=champion%>.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
+            Orbwalker = new Orbwalking.Orbwalker(<%=champion%>.SubMenu("Orbwalking"));
+
+            <%=champion%>.AddSubMenu(new Menu("Features", "Features"));
+            <%=champion%>.SubMenu("Features").AddSubMenu(new Menu("Drawings", "Drawings"));
+            <% if (draw.indexOf('Q') !== -1) {%><%=champion%>.SubMenu("Features").SubMenu("Drawings").AddItem(new MenuItem("Draw-Q", "Q").SetValue(false));<<%}%>
+            <% if (draw.indexOf('W') !== -1) {%><%=champion%>.SubMenu("Features").SubMenu("Drawings").AddItem(new MenuItem("Draw-W", "W").SetValue(false));<%}%>
+            <% if (draw.indexOf('E') !== -1) {%><%=champion%>.SubMenu("Features").SubMenu("Drawings").AddItem(new MenuItem("Draw-E", "E").SetValue(false));<%}%>
+            <% if (draw.indexOf('R') !== -1) {%><%=champion%>.SubMenu("Features").SubMenu("Drawings").AddItem(new MenuItem("Draw-R", "R").SetValue(false));<%}%>
+
+            <%=champion%>.AddToMainMenu();
+            #endregion
+
+            <%=spell%>
+            <%=skill%>
+
+            Game.OnUpdate += Game_OnGameUpdate;
+            <% if (draw.indexOf('Q') !== -1 || draw.indexOf('W') !== -1 || draw.indexOf('E') !== -1 || draw.indexOf('R') !== -1) {%>Drawing.OnDraw += Drawing_OnDraw;<%}%>
+        }
+
+        private static void Game_OnGameUpdate(EventArgs args)
+        {
+            #region goodies
+            QMana = Q.Instance.ManaCost;
+            WMana = W.Instance.ManaCost;
+            EMana = E.Instance.ManaCost;
+            RMana = R.Instance.ManaCost;
+            Combo = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
+            LaneClear = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
+            LastHit = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
+            Mixed = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed;
+            None = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.None;
+            #endregion
+
+            if (Combo)
+            {
+                if (Q.IsReady() && Player.Mana >= QMana) {
+                    Obj_AI_Hero target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical); // select a target in your Q range
+                    Obj_AI_Minion minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(m => Q.CanCast(m) && m.Health < Q.GetDamage(m)); //Select a killable minion
+
+                    Q.Cast(target.Position);   // It will cast to the target actual position, if he move away, your Q will land behind him. But it will cast immediately
+                    Q.Cast(target); // It will calculate the target movement speed and direction too, and it will cast your Q if it has some chance to hit
+                    Q.CastIfHitchanceEquals(target, HitChance.High); // With this you can define the minimum hitchance. With HitChance.High, most of time it wont cast uneless the target stand steady
+                    Q.CastIfWillHit(target, 2); // It will cast if your Q will hit the target and one or more enemy(Spells like Ezreal W or other AOE)
+                    //source:https://www.joduska.me/forum/topic/68451-prediction-coding-from-scratch/?p=730036
+                }
+            }
+        }
+
+        <% if (draw.indexOf('Q') !== -1 || draw.indexOf('W') !== -1 || draw.indexOf('E') !== -1 || draw.indexOf('R') !== -1) {%>private static void Drawing_OnDraw(EventArgs args)<%}%>
+        <% if (draw.indexOf('Q') !== -1 || draw.indexOf('W') !== -1 || draw.indexOf('E') !== -1 || draw.indexOf('R') !== -1) {%>{<%}%>
+            <% if (draw.indexOf('Q') !== -1) {%>if (<%=champion%>.Item("Draw-Q").GetValue<bool>()) {<%}%>
+                <% if (draw.indexOf('Q') !== -1) {%>Render.Circle.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.FromArgb(100, 255, 255, 255), 2);<%}%>
+            <% if (draw.indexOf('Q') !== -1) {%>}<%}%>
+            <% if (draw.indexOf('W') !== -1) {%>if (<%=champion%>.Item("Draw-W").GetValue<bool>()) {<%}%>
+                <% if (draw.indexOf('W') !== -1) {%>Render.Circle.DrawCircle(Player.Position, W.Range, System.Drawing.Color.FromArgb(100, 255, 255, 255), 2);<%}%>
+            <% if (draw.indexOf('W') !== -1) {%>}<%}%>
+            <% if (draw.indexOf('E') !== -1) {%>if (<%=champion%>.Item("Draw-E").GetValue<bool>()) {<%}%>
+                <% if (draw.indexOf('E') !== -1) {%>Render.Circle.DrawCircle(Player.Position, E.Range, System.Drawing.Color.FromArgb(100, 255, 255, 255), 2);<%}%>
+            <% if (draw.indexOf('E') !== -1) {%>}<%}%>
+            <% if (draw.indexOf('R') !== -1) {%>if (<%=champion%>.Item("Draw-R").GetValue<bool>()) {<%}%>
+                <% if (draw.indexOf('R') !== -1) {%>Render.Circle.DrawCircle(Player.Position, R.Range, System.Drawing.Color.FromArgb(100, 255, 255, 255), 2);<%}%>
+            <% if (draw.indexOf('R') !== -1) {%>}<%}%>
+        <% if (draw.indexOf('Q') !== -1 || draw.indexOf('W') !== -1 || draw.indexOf('E') !== -1 || draw.indexOf('R') !== -1) {%>}<%}%>
+    }
+}
