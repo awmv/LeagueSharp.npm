@@ -13,11 +13,11 @@ var clear = function () {
       return (file.match(/^LS[A-Z0-9]{8}$/gm) !== null);
   }).then(function(matches) {
       if (matches.length != 1) {
-        console.log(chalk());
+        console.log(chalk.magenta(figures.cross), 'Either your assemblies have not been compiled yet or your LeagueSharp folder could not been located.');
       } else {
         var repositoriesDir = path.join(osenv.home(), 'AppData', 'Roaming', matches.toString(), 'Repositories');
         fs.remove(repositoriesDir, function (err) {
-          console.log(repositoriesDir, chalk.green('has been deleted.'));
+          console.log(chalk.cyan(figures.tick), repositoriesDir, chalk.green('has been deleted.'));
         });
       }
   });

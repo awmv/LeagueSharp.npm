@@ -1,11 +1,13 @@
 {
   "name": "leaguesharp",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "CLI application for LeagueSharp",
   "keywords": [
     "LeagueSharp"
   ],
-  "author": "step1step2",
+  "author": {
+    "name": "step1step2"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/step1step2/LeagueSharp.npm.git"
@@ -35,5 +37,16 @@
     "string": "^3.1.1",
     "update-notifier": "^0.5.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "readme": "# LeagueSharp\nCLI application for LeagueSharp\n### Installation\n```sh\nnpm install -g leaguesharp\n```\n### Run \n```sh\nlsharp <command>\n```\n```sh\nleaguesharp <command>\n```\n### Update\n```sh\nlsharp self-update\n```\n### Help\n```sh\nlsharp\nleaguesharp\n```",
+  "readmeFilename": "README.md",
+  "gitHead": "0c047e15bc1e3243d87d46a3906f63d41370036a",
+  "bugs": {
+    "url": "https://github.com/step1step2/LeagueSharp.npm/issues"
+  },
+  "homepage": "https://github.com/step1step2/LeagueSharp.npm#readme",
+  "_id": "leaguesharp@1.0.4",
+  "scripts": {},
+  "_shasum": "22344da72ea26cf4aff26703baf209b8af8a3189",
+  "_from": "leaguesharp@*"
 }
